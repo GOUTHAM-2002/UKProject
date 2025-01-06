@@ -26,7 +26,8 @@ When interacting with users, maintain the following:
 Remember to use a supportive and encouraging tone, avoiding jargon or overly technical language. 
 Focus on building rapport and creating a trusting relationship with the user.
 """
-chat = model.start_chat(history=[pre_info])
+chat = model.start_chat(history=[])
+chat.send_message(pre_info)
 
 def chatbot_home(request):
     return render(request, 'chatbot/index.html')
