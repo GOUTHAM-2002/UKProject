@@ -132,6 +132,30 @@
             border-color: #3f9a60;
         }
 
+        /* Patient Appointments Section */
+        .appointments {
+            margin-top: 40px;
+        }
+
+        .appointment {
+            background-color: #2a2a2a;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        }
+
+        .appointment-header {
+            font-size: 1.4rem;
+            color: #50c878;
+        }
+
+        .appointment-details {
+            font-size: 1.1rem;
+            color: #f1f1f1;
+            margin-top: 5px;
+        }
+
     </style>
 </head>
 <body>
@@ -141,16 +165,52 @@
             <div class="avatar"></div>
             <h2 class="card-title">Therapist Profile</h2>
             <div class="card-body">
-                <p><strong>Name:</strong> {{ therapist.name }}</p>
-                <p><strong>Company Name:</strong> {{ therapist.company_name }}</p>
-                <p><strong>Years of Experience:</strong> {{ therapist.years_of_experience }}</p>
-                <p><strong>Expertise:</strong> {{ therapist.expertise }}</p>
-                <p><strong>License Certificate:</strong> <a href="{{ therapist.license_certificate.url }}" target="_blank">View</a></p>
-                <p><strong>Email:</strong> {{ therapist.user.email }}</p>
-                <p><strong>Phone:</strong> {{ therapist.user.phone_number }}</p>
+                <p><strong>Name:</strong> John Doe</p>
+                <p><strong>Company Name:</strong> HealthFirst Therapy</p>
+                <p><strong>Years of Experience:</strong> 8 Years</p>
+                <p><strong>Expertise:</strong> Cognitive Behavioral Therapy, Anxiety & Stress</p>
+                <p><strong>License Certificate:</strong> <a href="#" target="_blank">View</a></p>
+                <p><strong>Email:</strong> john.doe@healthfirst.com</p>
+                <p><strong>Phone:</strong> +44 1234 567890</p>
                 <a href="{% url 'edit_profile_therapist' %}" class="btn btn-dark-custom">Edit Profile</a>
             </div>
         </div>
+
+        <!-- Patient Appointments Section -->
+        <div class="appointments">
+            <h3 class="card-title">Upcoming Appointments</h3>
+
+            <div class="appointment">
+                <div class="appointment-header">
+                    Sarah Thompson - 15th January, 2025
+                </div>
+                <div class="appointment-details">
+                    <p><strong>Time:</strong> 3:00 PM</p>
+                    <p><strong>Reason:</strong> Anxiety Management</p>
+                </div>
+            </div>
+
+            <div class="appointment">
+                <div class="appointment-header">
+                    James Brown - 16th January, 2025
+                </div>
+                <div class="appointment-details">
+                    <p><strong>Time:</strong> 10:00 AM</p>
+                    <p><strong>Reason:</strong> Stress Relief</p>
+                </div>
+            </div>
+
+            <div class="appointment">
+                <div class="appointment-header">
+                    Emily Clark - 17th January, 2025
+                </div>
+                <div class="appointment-details">
+                    <p><strong>Time:</strong> 1:30 PM</p>
+                    <p><strong>Reason:</strong> PTSD Therapy</p>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- Optional: Adding an animation for the profile container -->

@@ -7,9 +7,10 @@
     <title>Your Profile</title>
     <style>
         body {
-            background-color: #121212;
+            background: linear-gradient(135deg, #121212, #333);
             color: #f1f1f1;
             font-family: 'Arial', sans-serif;
+            overflow-x: hidden;
         }
 
         .profile-container {
@@ -19,11 +20,23 @@
             background-color: #1f1f1f;
             border-radius: 15px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .profile-container:hover {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
         }
 
         .profile-header {
             text-align: center;
             margin-bottom: 30px;
+        }
+
+        .profile-header h2 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #50c878;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
         }
 
         .profile-details {
@@ -32,6 +45,13 @@
 
         .profile-details p {
             font-size: 1.1rem;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .profile-details p:hover {
+            color: #50c878;
+            transform: translateX(5px);
         }
 
         .btn-edit {
@@ -39,19 +59,22 @@
             border: none;
             color: #f1f1f1;
             font-size: 1.2rem;
-            padding: 10px 20px;
+            padding: 12px 25px;
             border-radius: 5px;
             transition: all 0.3s ease;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
         }
 
         .btn-edit:hover {
             background-color: #333;
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
         }
 
         /* Avatar Style */
         .avatar {
-            width: 100px;
-            height: 100px;
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
             background-image: url('{{ user.profile_pic.url }}');
             background-size: cover;
@@ -66,9 +89,74 @@
             border-color: #3f9a60;
         }
 
+        /* Chatbot Section */
+        .chatbot-container {
+            margin-top: 50px;
+            background-color: #2e2e2e;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .chatbot-container:hover {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+        }
+
+        .chatbot-header {
+            text-align: center;
+            font-size: 2rem;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+
+        .chatbot-content {
+            font-size: 1.1rem;
+            color: #f1f1f1;
+        }
+
+        .chatbot-btn {
+            background-color: #444;
+            border: none;
+            color: #f1f1f1;
+            font-size: 1.1rem;
+            padding: 12px 25px;
+            border-radius: 5px;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .chatbot-btn:hover {
+            background-color: #333;
+            transform: scale(1.05);
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 576px) {
+            .profile-container, .chatbot-container {
+                margin-top: 30px;
+                padding: 20px;
+            }
+
+            .profile-header h2 {
+                font-size: 2rem;
+            }
+
+            .btn-edit {
+                padding: 10px 20px;
+                font-size: 1rem;
+            }
+
+            .chatbot-btn {
+                padding: 10px 20px;
+                font-size: 1rem;
+            }
+        }
     </style>
 </head>
 <body>
+
     <div class="container profile-container">
         <!-- Avatar Section -->
         <div class="avatar"></div>
@@ -80,11 +168,24 @@
             <p><strong>Phone Number:</strong> {{ user.phone_number }}</p>
             <p><strong>Company Name:</strong> {{ user.company_name }}</p>
             <p><strong>Legal Name:</strong> {{ user.legal_name }}</p>
-
         </div>
         <div class="text-center">
             <a href="{% url 'edit_profile_user' %}" class="btn btn-edit">Edit Profile</a>
         </div>
     </div>
+
+    <!-- Chatbot Section -->
+    <div class="container chatbot-container">
+        <div class="chatbot-header">
+            <h3>Need Help? Chat with Our Bot!</h3>
+        </div>
+        <div class="chatbot-content">
+            <p>Our chatbot is ready to assist you with any queries. Get instant help and support for all your concerns.</p>
+        </div>
+        <div class="text-center">
+            <a href="{% url 'chatbot_home' %}" class="btn chatbot-btn">Start Chat</a>
+        </div>
+    </div>
+
 </body>
 </html>
