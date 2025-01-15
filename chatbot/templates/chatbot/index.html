@@ -2,293 +2,262 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'self'; style-src 'self' 'unsafe-inline';">
-    <title>Chatbot Interface</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #121212;
-            color: #ffffff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            padding: 0;
-        }
-        .chat-container {
-            width: 100%;
-            max-width: 480px;
-            background: #1e1e1e;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.8);
-            border-radius: 12px;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-        .messages {
-            padding: 20px;
-            flex: 1;
-            overflow-y: auto;
-            max-height: 60vh;
-        }
-        .messages div {
-            margin-bottom: 10px;
-            word-wrap: break-word;
-            word-break: break-word;
-        }
-        .user-message {
-            text-align: right;
-        }
-        .bot-message {
-            text-align: left;
-        }
-        .input-container {
-            display: flex;
-            padding: 10px;
-            background-color: #292929;
-            border-top: 1px solid #444;
-        }
-        .input-container input {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            border-radius: 6px;
-            outline: none;
-            background-color: #383838;
-            color: #ffffff;
-        }
-        .input-container input::placeholder {
-            color: #aaaaaa;
-        }
-        .input-container button {
-            padding: 10px 15px;
-            margin-left: 10px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-        .input-container .send-button {
-            background: #007bff;
-            color: #ffffff;
-            transition: background-color 0.3s ease;
-        }
-        .input-container .send-button:hover {
-            background: #0056b3;
-        }
-        .input-container .mic-button {
-            background: #ff5722;
-            color: #ffffff;
-            transition: background-color 0.3s ease;
-        }
-        .input-container .mic-button:hover {
-            background: #e64a19;
-        }
-        .messages::-webkit-scrollbar {
-            width: 8px;
-        }
-        .messages::-webkit-scrollbar-thumb {
-            background: #444;
-            border-radius: 4px;
-        }
-    </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Chatbot Interface</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #121212, #2d2d2d); /* Blackish grey gradient */
+      color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      padding: 0;
+    }
+
+    .chat-container {
+      width: 100%;
+      max-width: 480px;
+      background: #1e1e1e;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.8);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .messages {
+      padding: 20px;
+      flex: 1;
+      overflow-y: auto;
+      max-height: 60vh;
+    }
+
+    .messages div {
+      margin-bottom: 10px;
+      word-wrap: break-word;
+      word-break: break-word;
+    }
+
+    .user-message {
+      text-align: right;
+    }
+
+    .bot-message {
+      text-align: left;
+    }
+
+    .input-container {
+      display: flex;
+      padding: 10px;
+      background-color: #292929;
+      border-top: 1px solid #444;
+    }
+
+    .input-container input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      outline: none;
+      background-color: #383838;
+      color: #ffffff;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+    }
+
+    .input-container input::placeholder {
+      color: #aaaaaa;
+    }
+
+    .input-container button {
+      padding: 10px 15px;
+      margin-left: 10px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: transform 0.3s ease, background-color 0.3s ease;
+    }
+
+    .input-container .send-button {
+      background: #007bff;
+      color: #ffffff;
+    }
+
+    .input-container .send-button:hover {
+      background: #0056b3;
+      transform: scale(1.1);
+    }
+
+    .input-container .mic-button {
+      background: #ff5722;
+      color: #ffffff;
+    }
+
+    .input-container .mic-button:hover {
+      background: #e64a19;
+      transform: scale(1.1);
+    }
+
+    .messages::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .messages::-webkit-scrollbar-thumb {
+      background: #444;
+      border-radius: 4px;
+    }
+
+    /* Enhancing button focus and hover effects */
+    .input-container input:focus {
+      background-color: #4a4a4a;
+      border-color: #007bff;
+      outline: none;
+    }
+
+    .input-container .send-button:active,
+    .input-container .mic-button:active {
+      transform: scale(0.98);
+    }
+
+  </style>
 </head>
 <body>
-    <div class="chat-container shadow-lg">
-        <div class="messages" id="chat-window"></div>
-        <div class="input-container">
-            <input type="text" id="user-input" placeholder="Type your message here...">
-            <button class="btn send-button" onclick="sendMessage()">Send</button>
-            <button class="btn mic-button" onclick="startListening()">🎤</button>
-        </div>
+  <div class="chat-container shadow-lg">
+    <div class="messages" id="chat-window"></div>
+    <div class="input-container">
+      <input type="text" id="user-input" placeholder="Type your message here...">
+      <button class="btn send-button" onclick="sendMessage()">Send</button>
+      <button class="btn mic-button" onclick="startListening()">📞</button>
     </div>
+  </div>
 
-    <script>
-// Speech Recognition Controller
-class SpeechController {
+<script>
+  class ChatController {
     constructor() {
-        this.recognition = null;
-        this.isActive = false;
-        this.micButton = document.querySelector('.mic-button');
-        this.initializeSpeechRecognition();
-        this.setupEventListeners();
-    }
-
-    initializeSpeechRecognition() {
-        if (!('webkitSpeechRecognition' in window)) {
-            console.error('Speech recognition not supported');
-            return;
-        }
-
-        this.recognition = new webkitSpeechRecognition();
-        this.configureRecognition();
-    }
-
-    configureRecognition() {
-        this.recognition.lang = 'en-GB';
-        this.recognition.interimResults = false;
-        this.recognition.maxAlternatives = 1;
-        this.recognition.continuous = false;
-
-        this.recognition.onresult = (event) => {
-            const transcript = event.results[0][0].transcript;
-            document.getElementById('user-input').value = transcript;
-            chatController.sendMessage();
-        };
-
-        this.recognition.onspeechend = () => this.stopListening();
-        this.recognition.onerror = (event) => this.handleError(event);
-        this.recognition.onend = () => this.stopListening();
-    }
-
-    handleError(event) {
-        console.error('Speech recognition error:', event.error);
-        if (event.error === 'no-speech') {
-            this.showNotification('No speech detected. Please try again.');
-        } else if (event.error !== 'aborted') {
-            this.showNotification(`Speech recognition error: ${event.error}`);
-        }
-        this.stopListening();
-    }
-
-    showNotification(message) {
-        // Using alert for now, but could be replaced with a better UI notification
-        alert(message);
-    }
-
-    startListening() {
-        if (this.isActive) {
-            this.stopListening();
-            return;
-        }
-
-        try {
-            this.recognition.start();
-            this.isActive = true;
-            this.updateMicButtonState(true);
-        } catch (error) {
-            console.error('Error starting recognition:', error);
-            this.stopListening();
-        }
-    }
-
-    stopListening() {
-        if (this.recognition) {
-            try {
-                this.recognition.stop();
-            } catch (error) {
-                console.error('Error stopping recognition:', error);
-            }
-        }
-        this.isActive = false;
-        this.updateMicButtonState(false);
-    }
-
-    updateMicButtonState(isListening) {
-        this.micButton.style.background = isListening ? '#dc3545' : '#ff5722';
-        this.micButton.textContent = isListening ? '⏹️' : '🎤';
+      this.chatWindow = document.getElementById('chat-window');
+      this.userInput = document.getElementById('user-input');
+      this.setupEventListeners();
     }
 
     setupEventListeners() {
-        this.micButton.addEventListener('click', () => this.startListening());
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden && this.isActive) {
-                this.stopListening();
-            }
-        });
-    }
-}
+      document.querySelector('.send-button').addEventListener('click', () => this.sendMessage());
+      this.userInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          this.sendMessage();
+        }
+      });
 
-// Chat Controller
-class ChatController {
-    constructor() {
-        this.chatWindow = document.getElementById('chat-window');
-        this.userInput = document.getElementById('user-input');
-        this.setupEventListeners();
-    }
-
-    setupEventListeners() {
-        document.querySelector('.send-button').addEventListener('click', () => this.sendMessage());
-        this.userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                this.sendMessage();
-            }
-        });
+      // Add event listener for the mic button (call button)
+      document.querySelector('.mic-button').addEventListener('click', () => this.handleCallButtonClick());
     }
 
     getCSRFToken() {
-        const cookies = document.cookie.split(';');
-        for (let cookie of cookies) {
-            cookie = cookie.trim();
-            if (cookie.startsWith('csrftoken=')) {
-                return cookie.substring('csrftoken='.length);
-            }
+      const cookies = document.cookie.split(';');
+      for (let cookie of cookies) {
+        cookie = cookie.trim();
+        if (cookie.startsWith('csrftoken=')) {
+          return cookie.substring('csrftoken='.length);
         }
-        return '';
+      }
+      return '';
     }
 
     async sendMessage() {
-        const message = this.userInput.value.trim();
-        if (!message) return;
+      const message = this.userInput.value.trim();
+      if (!message) return;
 
-        this.appendMessage('user', message);
-        this.userInput.value = '';
+      this.appendMessage('user', message);
+      this.userInput.value = '';
 
-        try {
-            const response = await fetch('/get-response/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': this.getCSRFToken(),
-                },
-                body: `message=${encodeURIComponent(message)}`
-            });
+      try {
+        const response = await fetch('/get-response/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': this.getCSRFToken(),
+          },
+          body: `message=${encodeURIComponent(message)}`
+        });
 
-            if (!response.ok) throw new Error('Network response was not ok');
+        if (!response.ok) throw new Error('Network response was not ok');
 
-            const data = await response.json();
-            this.appendMessage('bot', data.response);
-            this.speakResponse(data.response);
-        } catch (error) {
-            console.error('Error:', error);
-            this.appendMessage('bot', 'Sorry, something went wrong.');
-        }
+        const data = await response.json();
+        this.appendMessage('bot', data.response);
+        this.speakResponse(data.response);
+      } catch (error) {
+        console.error('Error:', error);
+        this.appendMessage('bot', 'Sorry, something went wrong.');
+      }
     }
 
     appendMessage(sender, message) {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = sender === 'user' ? 'user-message' : 'bot-message';
-        messageDiv.innerHTML = `<strong>${sender === 'user' ? 'You' : 'Bot'}:</strong> ${message}`;
-        this.chatWindow.appendChild(messageDiv);
-        this.chatWindow.scrollTop = this.chatWindow.scrollHeight;
+      const messageDiv = document.createElement('div');
+      messageDiv.className = sender === 'user' ? 'user-message' : 'bot-message';
+      messageDiv.innerHTML = `<strong>${sender === 'user' ? 'You' : 'Bot'}:</strong> ${message}`;
+      this.chatWindow.appendChild(messageDiv);
+      this.chatWindow.scrollTop = this.chatWindow.scrollHeight;
     }
 
     speakResponse(text) {
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'en-US';
-        utterance.rate = 1.2;
-        window.speechSynthesis.speak(utterance);
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-US';
+      utterance.rate = 1.2;
+      window.speechSynthesis.speak(utterance);
     }
-}
 
-// Initialize controllers when DOM is loaded
-let speechController;
-let chatController;
+    handleCallButtonClick() {
+      const phoneNumber = prompt("Enter your phone number:");
 
-document.addEventListener('DOMContentLoaded', () => {
-    chatController = new ChatController();
-    speechController = new SpeechController();
-});
+      if (phoneNumber) {
+        const url = 'https://api-west.millis.ai/start_outbound_call';
+        const requestData = {
+          from_phone: "+16507196658",
+          to_phone: phoneNumber,
+          metadata: { key: "value" },
+          include_metadata_in_prompt: true
+        };
 
-    </script>
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+        fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'b5RxpirIo236pZukXofYrfE25uedtq2s',
+          },
+          body: JSON.stringify(requestData),
+        })
+        .then(response => {
+          console.log(response);
+          if (response.ok) {
+            alert("Call request sent successfully!");
+          } else {
+            alert("Failed to send the call request.");
+          }
+        })
+        .catch(error => {
+          console.error("Error:", error);
+          alert("An error occurred while sending the call request.");
+        });
+      } else {
+        alert("No phone number entered.");
+      }
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const chatController = new ChatController();
+  });
+</script>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
