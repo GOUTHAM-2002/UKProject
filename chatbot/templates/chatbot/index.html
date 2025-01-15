@@ -145,37 +145,48 @@
             });
         }
 
-        function startListening() {
-            if (!('webkitSpeechRecognition' in window)) {
-                alert('Sorry, your browser does not support speech recognition.');
-                return;
-            }
+function startListening() {
+    if (!('webkitSpeechRecognition' in window)) {
+        alert('Sorry, your browser does not support speech recognition.');
+        return;
+    }
 
-            const recognition = new webkitSpeechRecognition();
-            recognition.lang = 'en-GB';
-            recognition.interimResults = false;
-            recognition.maxAlternatives = 1;
+    const recognition = new webkitSpeechRecognition();
+    recognition.lang = 'en-GB'; // Set the language
+    recognition.interimResults = false; // Do not show interim results
+    recognition.maxAlternatives = 1; // Return only the top result
 
-            recognition.start();
+    recognition.start();
 
-            recognition.onresult = (event) => {
-                const transcript = event.results[0][0].transcript;
-                document.getElementById('user-input').value = transcript;
-                sendMessage();
-            };
+    // When speech recognition captures a result
+    recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById('user-input').value = transcript; // Populate the input
+        sendMessage(); // Automatically send the message
+    };
 
-            recognition.onerror = (event) => {
-                if (event.error === 'no-speech') {
-                    alert('No speech detected. Please try again.');
-                } else {
-                    alert('Speech recognition error: ' + event.error);
-                }
-            };
+    // Stop listening when the user stops speaking
+    recognition.onspeechend = () => {
+        console.log('Speech has stopped.');
+        recognition.stop();
+    };
 
-            recognition.onend = () => {
-                console.log('Speech recognition ended.');
-            };
+    // Handle errors during speech recognition
+    recognition.onerror = (event) => {
+        if (event.error === 'no-speech') {
+            alert('No speech detected. Please try again.');
+        } else {
+            alert('Speech recognition error: ' + event.error);
         }
+        recognition.stop(); // Ensure the mic stops
+    };
+
+    // Ensure recognition stops properly on end
+    recognition.onend = () => {
+        console.log('Speech recognition ended.');
+    };
+}
+
 
         function speakOutLoud(text) {
             const utterance = new SpeechSynthesisUtterance(text);
