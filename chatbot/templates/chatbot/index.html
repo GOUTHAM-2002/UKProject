@@ -65,6 +65,9 @@
             cursor: pointer;
             margin-left: 10px;
         }
+        .input-container .mic-button {
+            background: #ff5722;
+        }
         /* Mobile responsiveness */
         @media (max-width: 600px) {
             .input-container {
@@ -82,6 +85,7 @@
         <div class="input-container">
             <input type="text" id="user-input" placeholder="Type your message here...">
             <button onclick="sendMessage()">Send</button>
+            <button class="mic-button" onclick="startListening()">🎤</button>
         </div>
     </div>
 
@@ -98,32 +102,75 @@
     }
 
     function sendMessage() {
-    const input = document.getElementById('user-input');
-    const message = input.value.trim();
-    if (!message) return;
+        const input = document.getElementById('user-input');
+        const message = input.value.trim();
+        if (!message) return;
 
-    const chatWindow = document.getElementById('chat-window');
-    chatWindow.innerHTML += `<div class="user-message"><strong>You:</strong> ${message}</div>`;
-    input.value = "";
+        const chatWindow = document.getElementById('chat-window');
+        chatWindow.innerHTML += `<div class="user-message"><strong>You:</strong> ${message}</div>`;
+        input.value = "";
 
-    fetch('/get-response/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'X-CSRFToken': getCSRFToken(),
-        },
-        body: `message=${encodeURIComponent(message)}`
-    })
-    .then(response => response.json())
-    .then(data => {
-        chatWindow.innerHTML += `<div class="bot-message"><strong>Bot:</strong> ${data.response}</div>`;
-        chatWindow.scrollTop = chatWindow.scrollHeight;
-    })
-    .catch(error => {
-        chatWindow.innerHTML += `<div class="bot-message"><strong>Bot:</strong> Sorry, something went wrong.</div>`;
-    });
-}
+        fetch('/get-response/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': getCSRFToken(),
+            },
+            body: `message=${encodeURIComponent(message)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            chatWindow.innerHTML += `<div class="bot-message"><strong>Bot:</strong> ${data.response}</div>`;
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+            speakOutLoud(data.response);
+        })
+        .catch(error => {
+            chatWindow.innerHTML += `<div class="bot-message"><strong>Bot:</strong> Sorry, something went wrong.</div>`;
+        });
+    }
 
+    function startListening() {
+        if (!('webkitSpeechRecognition' in window)) {
+            alert('Sorry, your browser does not support speech recognition.');
+            return;
+        }
+
+        const recognition = new webkitSpeechRecognition();
+        recognition.lang = 'en-GB';
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        recognition.start();
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            document.getElementById('user-input').value = transcript;
+            sendMessage();
+        };
+
+        recognition.onerror = (event) => {
+            alert('Speech recognition error: ' + event.error);
+        };
+
+        recognition.onend = () => {
+            console.log('Speech recognition ended.');
+        };
+    }
+
+    function speakOutLoud(text) {
+      const sanitizedText = text
+    .replace(/\./g, ',')            // Replace full stops with commas
+    .replace(/[^a-zA-Z0-9\s,]/g, '') // Remove all non-alphanumeric characters except commas
+    .toLowerCase()                  // Convert to lowercase
+    .trim()                         // Remove leading/trailing spaces
+    .slice(0, -1);                  // Remove the last letter
+
+        const utterance = new SpeechSynthesisUtterance(sanitizedText);
+        utterance.lang = 'en-US';
+        utterance.rate = 1.5;
+
+        window.speechSynthesis.speak(utterance);
+    }
 </script>
 
 </body>

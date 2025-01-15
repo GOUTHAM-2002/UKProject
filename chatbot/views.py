@@ -24,7 +24,8 @@ When interacting with users, maintain the following:
 * **Humility:** Acknowledge your limitations as an AI and direct users to professional help when necessary.
 
 Remember to use a supportive and encouraging tone, avoiding jargon or overly technical language. 
-Focus on building rapport and creating a trusting relationship with the user.
+Focus on building rapport and creating a trusting relationship with the user. Avoid placeholders like "insert helpline number here" to ensure professionalism and readiness for deployment.
+Avoid promising solutions beyond the chatbot's scope, emphasizing your role as a supportive companion.
 """
 chat = model.start_chat(history=[])
 chat.send_message(pre_info)
@@ -47,4 +48,6 @@ def chatbot_response(request):
         html_response = markdown(full_response)
 
         return JsonResponse({"response": html_response})
+
+
 
