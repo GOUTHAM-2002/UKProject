@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Therapist Registration</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #121212;
+            color: #f1f1f1;
+            font-family: 'Arial', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 700px;
+            margin-top: 100px;
+            padding: 30px;
+            background-color: #1f1f1f;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 1s ease-out;
+        }
+
+        .card-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 20px;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .form-control {
+            background-color: #333;
+            border: 1px solid #444;
+            color: #f1f1f1;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            background-color: #444;
+            border-color: #50c878;
+            color: #fff;
+            box-shadow: 0 0 5px rgba(80, 200, 120, 0.6);
+        }
+
+        .btn-primary {
+            background-color: #50c878;
+            border: none;
+            color: #fff;
+            font-size: 1.2rem;
+            width: 100%;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #3f9a60;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-light {
+            color: #f1f1f1;
+            transition: all 0.3s ease;
+        }
+
+        .text-light:hover {
+            color: #50c878;
+            text-decoration: underline;
+        }
+
+        .therapist-emoji {
+            font-size: 3rem;
+            animation: bounce 1s infinite alternate;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes bounce {
+            0% {
+                transform: translateY(0);
+            }
+            100% {
+                transform: translateY(-15px);
+            }
+        }
+
+        .form-group h4 {
+            font-size: 1.5rem;
+            margin-top: 20px;
+            font-weight: bold;
+            color: #50c878;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            color: #f1f1f1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="text-center">
+            <span class="therapist-emoji">🧑‍⚕️</span>
+            <h2 class="card-title">Therapist Registration</h2>
+        </div>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- User Registration Fields -->
+            <h4>Personal Information</h4>
+            <div class="form-group mb-3">
+                {{ user_form.email.label }}
+                {{ user_form.email }}
+            </div>
+            <div class="form-group mb-3">
+                {{ user_form.phone_number.label }}
+                {{ user_form.phone_number }}
+            </div>
+            <div class="form-group mb-3">
+                {{ user_form.company_name.label }}
+                {{ user_form.company_name }}
+            </div>
+            <div class="form-group mb-3">
+                {{ user_form.legal_name.label }}
+                {{ user_form.legal_name }}
+            </div>
+            <div class="form-group mb-3">
+                {{ user_form.profile_pic.label }}
+                {{ user_form.profile_pic }}
+            </div>
+            <div class="form-group mb-3">
+                {{ user_form.password.label }}
+                {{ user_form.password }}
+            </div>
+
+            <hr>
+
+            <!-- Therapist Registration Fields -->
+            <h4>Additional Details</h4>
+            <div class="form-group mb-3">
+                {{ details_form.name.label }}
+                {{ details_form.name }}
+            </div>
+            <div class="form-group mb-3">
+                {{ details_form.years_of_experience.label }}
+                {{ details_form.years_of_experience }}
+            </div>
+            <div class="form-group mb-3">
+                {{ details_form.expertise.label }}
+                {{ details_form.expertise }}
+            </div>
+            <div class="form-group mb-3">
+                {{ details_form.license_certificate.label }}
+                {{ details_form.license_certificate }}
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary w-100">Register as Therapist</button>
+        </form>
+
+        <div class="text-center mt-3">
+            <p>Already have an account? <a href="{% url 'login' %}" class="text-light">Login here</a></p>
+        </div>
+    </div>
+
+</body>
+</html>
