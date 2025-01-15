@@ -110,105 +110,182 @@
     </div>
 
     <script>
-     let recognition; // Persistent recognition instance for iOS compatibility
-
-function initializeSpeechRecognition() {
-    if (!('webkitSpeechRecognition' in window)) {
-        alert('Sorry, your browser does not support speech recognition.');
-        return;
+// Speech Recognition Controller
+class SpeechController {
+    constructor() {
+        this.recognition = null;
+        this.isActive = false;
+        this.micButton = document.querySelector('.mic-button');
+        this.initializeSpeechRecognition();
+        this.setupEventListeners();
     }
 
-    recognition = new webkitSpeechRecognition();
-    recognition.lang = 'en-GB'; // Set the language
-    recognition.interimResults = false; // Do not show interim results
-    recognition.maxAlternatives = 1; // Return only the top result
+    initializeSpeechRecognition() {
+        if (!('webkitSpeechRecognition' in window)) {
+            console.error('Speech recognition not supported');
+            return;
+        }
 
-    // When speech recognition captures a result
-    recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        document.getElementById('user-input').value = transcript; // Populate the input
-        sendMessage(); // Automatically send the message
-    };
+        this.recognition = new webkitSpeechRecognition();
+        this.configureRecognition();
+    }
 
-    // Stop listening when the user stops speaking
-    recognition.onspeechend = () => {
-        console.log('Speech has stopped.');
-        recognition.stop();
-    };
+    configureRecognition() {
+        this.recognition.lang = 'en-GB';
+        this.recognition.interimResults = false;
+        this.recognition.maxAlternatives = 1;
+        this.recognition.continuous = false;
 
-    // Handle errors during speech recognition
-    recognition.onerror = (event) => {
+        this.recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            document.getElementById('user-input').value = transcript;
+            chatController.sendMessage();
+        };
+
+        this.recognition.onspeechend = () => this.stopListening();
+        this.recognition.onerror = (event) => this.handleError(event);
+        this.recognition.onend = () => this.stopListening();
+    }
+
+    handleError(event) {
+        console.error('Speech recognition error:', event.error);
         if (event.error === 'no-speech') {
-            alert('No speech detected. Please try again.');
-        } else {
-            alert('Speech recognition error: ' + event.error);
+            this.showNotification('No speech detected. Please try again.');
+        } else if (event.error !== 'aborted') {
+            this.showNotification(`Speech recognition error: ${event.error}`);
         }
-        recognition.stop(); // Ensure the mic stops
-    };
-
-    // Ensure recognition stops properly on end
-    recognition.onend = () => {
-        console.log('Speech recognition ended.');
-    };
-}
-
-function startListening() {
-    if (!recognition) {
-        alert('Speech recognition is not initialized.');
-        return;
+        this.stopListening();
     }
 
-    recognition.start(); // Start listening
-}
+    showNotification(message) {
+        // Using alert for now, but could be replaced with a better UI notification
+        alert(message);
+    }
 
-function getCSRFToken() {
-    const cookies = document.cookie.split(';');
-    for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i].trim();
-        if (cookie.startsWith('csrftoken=')) {
-            return cookie.substring('csrftoken='.length, cookie.length);
+    startListening() {
+        if (this.isActive) {
+            this.stopListening();
+            return;
+        }
+
+        try {
+            this.recognition.start();
+            this.isActive = true;
+            this.updateMicButtonState(true);
+        } catch (error) {
+            console.error('Error starting recognition:', error);
+            this.stopListening();
         }
     }
-    return '';
+
+    stopListening() {
+        if (this.recognition) {
+            try {
+                this.recognition.stop();
+            } catch (error) {
+                console.error('Error stopping recognition:', error);
+            }
+        }
+        this.isActive = false;
+        this.updateMicButtonState(false);
+    }
+
+    updateMicButtonState(isListening) {
+        this.micButton.style.background = isListening ? '#dc3545' : '#ff5722';
+        this.micButton.textContent = isListening ? '⏹️' : '🎤';
+    }
+
+    setupEventListeners() {
+        this.micButton.addEventListener('click', () => this.startListening());
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && this.isActive) {
+                this.stopListening();
+            }
+        });
+    }
 }
 
-function sendMessage() {
-    const input = document.getElementById('user-input');
-    const message = input.value.trim();
-    if (!message) return;
+// Chat Controller
+class ChatController {
+    constructor() {
+        this.chatWindow = document.getElementById('chat-window');
+        this.userInput = document.getElementById('user-input');
+        this.setupEventListeners();
+    }
 
-    const chatWindow = document.getElementById('chat-window');
-    chatWindow.innerHTML += `<div class="user-message"><strong>You:</strong> ${message}</div>`;
-    input.value = "";
+    setupEventListeners() {
+        document.querySelector('.send-button').addEventListener('click', () => this.sendMessage());
+        this.userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                this.sendMessage();
+            }
+        });
+    }
 
-    fetch('/get-response/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'X-CSRFToken': getCSRFToken(),
-        },
-        body: `message=${encodeURIComponent(message)}`
-    })
-    .then(response => response.json())
-    .then(data => {
-        chatWindow.innerHTML += `<div class="bot-message"><strong>Bot:</strong> ${data.response}</div>`;
-        chatWindow.scrollTop = chatWindow.scrollHeight;
-        speakOutLoud(data.response);
-    })
-    .catch(error => {
-        chatWindow.innerHTML += `<div class="bot-message"><strong>Bot:</strong> Sorry, something went wrong.</div>`;
-    });
+    getCSRFToken() {
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+            cookie = cookie.trim();
+            if (cookie.startsWith('csrftoken=')) {
+                return cookie.substring('csrftoken='.length);
+            }
+        }
+        return '';
+    }
+
+    async sendMessage() {
+        const message = this.userInput.value.trim();
+        if (!message) return;
+
+        this.appendMessage('user', message);
+        this.userInput.value = '';
+
+        try {
+            const response = await fetch('/get-response/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': this.getCSRFToken(),
+                },
+                body: `message=${encodeURIComponent(message)}`
+            });
+
+            if (!response.ok) throw new Error('Network response was not ok');
+
+            const data = await response.json();
+            this.appendMessage('bot', data.response);
+            this.speakResponse(data.response);
+        } catch (error) {
+            console.error('Error:', error);
+            this.appendMessage('bot', 'Sorry, something went wrong.');
+        }
+    }
+
+    appendMessage(sender, message) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = sender === 'user' ? 'user-message' : 'bot-message';
+        messageDiv.innerHTML = `<strong>${sender === 'user' ? 'You' : 'Bot'}:</strong> ${message}`;
+        this.chatWindow.appendChild(messageDiv);
+        this.chatWindow.scrollTop = this.chatWindow.scrollHeight;
+    }
+
+    speakResponse(text) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US';
+        utterance.rate = 1.2;
+        window.speechSynthesis.speak(utterance);
+    }
 }
 
-function speakOutLoud(text) {
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'en-US';
-    utterance.rate = 1.2; // Adjust speed if needed
-    window.speechSynthesis.speak(utterance);
-}
+// Initialize controllers when DOM is loaded
+let speechController;
+let chatController;
 
-// Initialize SpeechRecognition on page load
-document.addEventListener('DOMContentLoaded', initializeSpeechRecognition);
+document.addEventListener('DOMContentLoaded', () => {
+    chatController = new ChatController();
+    speechController = new SpeechController();
+});
 
     </script>
     <!-- Bootstrap JS -->
