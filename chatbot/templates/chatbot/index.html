@@ -86,7 +86,6 @@
         .input-container .mic-button:hover {
             background: #e64a19;
         }
-        /* Scrollbar styling */
         .messages::-webkit-scrollbar {
             width: 8px;
         }
@@ -166,7 +165,11 @@
             };
 
             recognition.onerror = (event) => {
-                alert('Speech recognition error: ' + event.error);
+                if (event.error === 'no-speech') {
+                    alert('No speech detected. Please try again.');
+                } else {
+                    alert('Speech recognition error: ' + event.error);
+                }
             };
 
             recognition.onend = () => {
@@ -175,17 +178,9 @@
         }
 
         function speakOutLoud(text) {
-            const sanitizedText = text
-                .replace(/\./g, ',')            // Replace full stops with commas
-                .replace(/[^a-zA-Z0-9\s,]/g, '') // Remove all non-alphanumeric characters except commas
-                .toLowerCase()                  // Convert to lowercase
-                .trim()                         // Remove leading/trailing spaces
-                .slice(0, -1);                  // Remove the last letter
-
-            const utterance = new SpeechSynthesisUtterance(sanitizedText);
+            const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'en-US';
-            utterance.rate = 1.5;
-
+            utterance.rate = 1.2; // Adjust speed if needed
             window.speechSynthesis.speak(utterance);
         }
     </script>
