@@ -4,7 +4,7 @@ from django.contrib.auth import login, authenticate
 from .forms import UserRegistrationForm, TherapistRegistrationForm, TherapistDetailsForm, LoginForm, UserEditForm
 from django.contrib.auth.decorators import login_required
 from .forms import TherapistRegistrationForm, TherapistDetailsForm
-from .models import Therapist
+from .models import Therapist, CustomUser, Questionnaire, Question, Answer
 from django.shortcuts import render, get_object_or_404
 from django.contrib import messages
 from .models import Therapist, Ping
@@ -42,7 +42,7 @@ def register_user(request):
             user.set_password(form.cleaned_data['password'])
             user.save()
             login(request, user)
-            return redirect('profile_page_user')  # Redirect to the profile page
+            return redirect('questionnaire')  # Redirect to the profile page
     else:
         form = UserRegistrationForm()
     return render(request, 'user_management/register_user.html', {'form': form})
@@ -152,3 +152,27 @@ def pings_view(request):
     therapist = get_object_or_404(Therapist, user=request.user)
     pings = therapist.pings.all()
     return render(request, 'user_management/pings.html', {'pings': pings})
+
+
+@login_required
+def questionnaire_view(request):
+    questions = Question.objects.all()
+
+    if request.method == "POST":
+        for question in questions:
+            selected_answer = request.POST.get(str(question.id))
+            if selected_answer:
+                answer = Answer.objects.get(id=selected_answer)
+                Questionnaire.objects.create(user=request.user, question=question, answer=answer)
+
+        return redirect('user_home')
+
+    return render(request, 'user_management/questions.html', {'questions': questions})
+
+def user_questionnaire(request, user_id):
+    user = CustomUser.objects.get(id=user_id)
+    questionnaires = Questionnaire.objects.filter(user=user)
+    return render(request, 'user_management/user_questionarre.html', {
+        'user': user,
+        'questionnaires': questionnaires
+    })

@@ -71,3 +71,30 @@ class Ping(models.Model):
 
     class Meta:
         unique_together = ('therapist', 'user')  # To ensure a user can ping the same therapist only once
+
+
+
+class Question(models.Model):
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.text
+
+class Answer(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='answers')
+    text = models.TextField()
+    is_choice = models.BooleanField(default=True)  # To identify answer choices
+
+    def __str__(self):
+        return f"Answer to '{self.question.text}': {self.text[:50]}..."  # Display part of the answer
+
+class Questionnaire(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='questionnaires')
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    answer = models.ForeignKey(Answer, on_delete=models.CASCADE)
+    submitted_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Questionnaire for {self.user.email} - {self.question.text[:50]}"
+

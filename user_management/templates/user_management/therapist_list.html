@@ -5,43 +5,83 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Therapists</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         body {
-            background-color: black;
-            color: white; /* To make sure the text is visible on the black background */
+            background-color: #121212;
+            color: white;
+        }
+
+        .container {
+            margin-top: 20px;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: #50c878;
+            padding: 12px;
+            border-radius: 50%;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .back-btn:hover {
+            background-color: #3f9a60;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.6);
         }
 
         .therapist-tile {
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            overflow: hidden;
-            margin: 20px;
+            background-color: #1e1e1e;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
             cursor: pointer;
-            transition: transform 0.3s;
+            margin: 20px;
         }
+
         .therapist-tile:hover {
             transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
         }
+
         .therapist-img {
             width: 100%;
             height: 200px;
             object-fit: cover;
+            border-radius: 15px 15px 0 0;
         }
+
         .therapist-info {
             padding: 15px;
             text-align: center;
         }
+
         .therapist-info h5 {
             margin: 10px 0;
+            color: #81c784;
         }
+
         .therapist-info p {
-            color: #777;
+            color: #b0bec5;
         }
+
+        .row {
+            margin-top: 50px;
+        }
+
     </style>
 </head>
 <body>
+    <a href="javascript:history.back()" class="back-btn">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+
     <div class="container">
-        <h1 class="my-5 text-center">Our Therapists</h1>
+        <h1 class="my-5 text-center text-white">Our Therapists</h1>
         <div class="row">
             {% for therapist in therapists %}
                 <div class="col-md-3">
@@ -55,5 +95,8 @@
             {% endfor %}
         </div>
     </div>
+
+    <!-- Font Awesome Icons -->
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
 </body>
 </html>

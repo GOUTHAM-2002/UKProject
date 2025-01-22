@@ -4,39 +4,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home Page</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://kit.fontawesome.com/a076d05399.css">
     <style>
         body {
             background-color: #121212;
             color: #e0e0e0;
+            font-family: 'Arial', sans-serif;
+            position: relative;
         }
 
         .container {
             max-width: 1200px;
+            padding-top: 50px;
         }
 
         .home-title {
             color: #81c784;
             text-align: center;
-            margin-top: 50px;
+            margin-bottom: 50px;
             font-size: 2.5rem;
             font-weight: 600;
         }
 
         .tile {
-            background-color: #1e1e1e;
-            border-radius: 15px;
+            background: linear-gradient(145deg, #1e1e1e, #2c2c2c);
+            border-radius: 20px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            transition: transform 0.3s, box-shadow 0.3s;
+            transition: transform 0.3s, box-shadow 0.3s ease-in-out;
             padding: 40px;
             margin: 20px;
             text-align: center;
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
         }
 
         .tile:hover {
             transform: scale(1.05);
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .tile i {
+            font-size: 4rem;
+            color: #81c784;
         }
 
         .tile h3 {
@@ -51,11 +63,6 @@
             margin-top: 10px;
         }
 
-        .tile i {
-            font-size: 4rem;
-            color: #81c784;
-        }
-
         .row {
             margin-top: 50px;
         }
@@ -64,9 +71,39 @@
             text-decoration: none;
             color: inherit;
         }
+
+        /* Back Button Styling */
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: #50c878;
+            color: white;
+            border-radius: 50%;
+            padding: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            font-size: 1.5rem;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .back-btn:hover {
+            background-color: #3f9a60;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.6);
+        }
     </style>
 </head>
 <body>
+    <!-- Back Button -->
+  <a href="{% url 'login' %}" class="back-btn">
+    <i class="fas fa-arrow-left"></i> Login
+</a>
+
+    <br>
+    <br>
+
+
     <div class="container">
         <h1 class="home-title">Welcome to Your Dashboard</h1>
         <div class="row">
