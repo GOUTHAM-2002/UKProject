@@ -59,3 +59,15 @@ class Therapist(models.Model):
     years_of_experience = models.PositiveIntegerField()
     expertise = models.TextField()
     license_certificate = models.FileField(upload_to='certificates/')
+
+
+
+
+class Ping(models.Model):
+    therapist = models.ForeignKey(Therapist, on_delete=models.CASCADE, related_name='pings')
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='pinged_therapists')
+    timestamp = models.DateTimeField(auto_now_add=True)
+    message = models.TextField(blank=True, null=True)  # Added message field
+
+    class Meta:
+        unique_together = ('therapist', 'user')  # To ensure a user can ping the same therapist only once

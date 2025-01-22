@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Therapists</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: black;
+            color: white; /* To make sure the text is visible on the black background */
+        }
+
+        .therapist-tile {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .therapist-tile:hover {
+            transform: scale(1.05);
+        }
+        .therapist-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .therapist-info {
+            padding: 15px;
+            text-align: center;
+        }
+        .therapist-info h5 {
+            margin: 10px 0;
+        }
+        .therapist-info p {
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="my-5 text-center">Our Therapists</h1>
+        <div class="row">
+            {% for therapist in therapists %}
+                <div class="col-md-3">
+                    <div class="therapist-tile" onclick="window.location.href='{% url 'therapist_detail' therapist.id %}'">
+                        <div class="therapist-info">
+                            <h5>{{ therapist.name }}</h5>
+                            <p>{{ therapist.expertise|truncatewords:10 }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

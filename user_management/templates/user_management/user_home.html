@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+
+        .container {
+            max-width: 1200px;
+        }
+
+        .home-title {
+            color: #81c784;
+            text-align: center;
+            margin-top: 50px;
+            font-size: 2.5rem;
+            font-weight: 600;
+        }
+
+        .tile {
+            background-color: #1e1e1e;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+            padding: 40px;
+            margin: 20px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .tile:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .tile h3 {
+            font-size: 1.8rem;
+            color: #81c784;
+            margin-top: 15px;
+        }
+
+        .tile p {
+            color: #b0bec5;
+            font-size: 1.1rem;
+            margin-top: 10px;
+        }
+
+        .tile i {
+            font-size: 4rem;
+            color: #81c784;
+        }
+
+        .row {
+            margin-top: 50px;
+        }
+
+        .tile a {
+            text-decoration: none;
+            color: inherit;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="home-title">Welcome to Your Dashboard</h1>
+        <div class="row">
+            <!-- Chatbot Tile -->
+            <div class="col-md-4">
+                <div class="tile" onclick="window.location.href='{% url 'chatbot_home' %}'">
+                    <i class="fas fa-robot"></i>
+                    <h3>Chatbot</h3>
+                    <p>Interact with your personal AI assistant</p>
+                </div>
+            </div>
+
+            <!-- Therapists Tile -->
+            <div class="col-md-4">
+                <div class="tile" onclick="window.location.href='{% url 'therapist_list' %}'">
+                    <i class="fas fa-user-md"></i>
+                    <h3>Therapists</h3>
+                    <p>Find the perfect therapist for you</p>
+                </div>
+            </div>
+
+            <!-- Profile Tile -->
+            <div class="col-md-4">
+                <div class="tile" onclick="window.location.href='{% url 'profile_page_user' %}'">
+                    <i class="fas fa-user-circle"></i>
+                    <h3>Profile</h3>
+                    <p>View and manage your profile</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Font Awesome Icons -->
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+</body>
+</html>

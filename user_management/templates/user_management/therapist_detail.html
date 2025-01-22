@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ therapist.name }}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .therapist-detail {
+            margin-top: 50px;
+            padding: 30px;
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .therapist-detail h1,
+        .therapist-detail h2 {
+            color: #81c784;
+            font-weight: bold;
+        }
+
+        .detail-info p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .detail-info strong {
+            color: #81c784;
+        }
+
+        .btn-back {
+            background-color: #388e3c;
+            border-color: #388e3c;
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1rem;
+            margin-top: 20px;
+            display: inline-block;
+        }
+
+        .btn-back:hover {
+            background-color: #2c6d31;
+            border-color: #2c6d31;
+        }
+
+        .btn-ping {
+            background-color: #81c784;
+            border-color: #66bb6a;
+            color: #fff;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .btn-ping:hover {
+            background-color: #66bb6a;
+            transform: scale(1.05);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .container h1 {
+            color: #81c784;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            font-size: 1rem;
+            border-radius: 8px;
+            border: 1px solid #81c784;
+            background-color: #2c2c2c;
+            color: #fff;
+            resize: vertical;
+        }
+
+        .message-list ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .message-list li {
+            background-color: #333;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            color: #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container therapist-detail">
+        <h1 class="text-center mb-5">Therapist Details</h1>
+        <div class="row">
+            <div class="col-md-12 detail-info">
+                <h2>{{ therapist.name }}</h2>
+                <p><strong>Years of Experience:</strong> {{ therapist.years_of_experience }}</p>
+                <p><strong>Expertise:</strong> {{ therapist.expertise }}</p>
+                <p><strong>License Certificate:</strong> <a href="{{ therapist.license_certificate.url }}" target="_blank" style="color: #81c784;">View Certificate</a></p>
+                <p><strong>Company Name:</strong> {{ therapist.user.company_name }}</p>
+                <p><strong>Legal Name:</strong> {{ therapist.user.legal_name }}</p>
+                <p><strong>Email:</strong> {{ therapist.user.email }}</p>
+                <p><strong>Phone Number:</strong> {{ therapist.user.phone_number }}</p>
+
+                <!-- Back button -->
+                <a href="#" class="btn btn-back">Back to Therapist List</a>
+
+                <!-- Display feedback messages -->
+                <div class="message-list">
+                    {% if messages %}
+                        <ul>
+                            {% for message in messages %}
+                                <li>{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+
+                <!-- Ping form -->
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="message">Enter your message:</label>
+                        <textarea name="message" id="message" rows="4" placeholder="Enter your message here..."></textarea>
+                    </div>
+                    <button type="submit" name="ping" class="btn btn-ping">Ping</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

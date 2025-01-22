@@ -5,11 +5,19 @@ from .forms import UserRegistrationForm, TherapistRegistrationForm, TherapistDet
 from django.contrib.auth.decorators import login_required
 from .forms import TherapistRegistrationForm, TherapistDetailsForm
 from .models import Therapist
+from django.shortcuts import render, get_object_or_404
+from django.contrib import messages
+from .models import Therapist, Ping
 
 @login_required
 def profile_page_therapist(request):
     therapist = Therapist.objects.get(user=request.user)
-    return render(request, 'user_management/profile_page_therapist.html', {'therapist': therapist})
+    # Retrieve all pings for the therapist
+    pings = therapist.pings.all()
+    return render(request, 'user_management/profile_page_therapist.html', {
+        'therapist': therapist,
+        'pings': pings,
+    })
 
 @login_required
 def edit_profile_therapist(request):
@@ -64,11 +72,17 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect('profile_page_user')  # Redirect to the profile page after login
+
+            # Check if the logged-in user is a therapist
+            if Therapist.objects.filter(user=user).exists():
+                return redirect('profile_page_therapist')  # Redirect therapists
+            else:
+                return redirect('user_home')  # Redirect regular users
+
     else:
         form = LoginForm()
-    return render(request, 'user_management/login.html', {'form': form})
 
+    return render(request, 'user_management/login.html', {'form': form})
 
 
 def base(request):
@@ -90,3 +104,51 @@ def edit_profile_user(request):
         form = UserEditForm(instance=request.user)
     return render(request, 'user_management/edit_profile_page_user.html', {'form': form})
 
+
+@login_required
+def therapist_list(request):
+    therapists = Therapist.objects.all()
+    return render(request, 'user_management/therapist_list.html', {'therapists': therapists})
+
+
+
+
+@login_required
+def therapist_detail(request, therapist_id):
+    therapist = get_object_or_404(Therapist, pk=therapist_id)
+
+    if request.method == "POST" and 'ping' in request.POST:
+        # Get the message from the form
+        message = request.POST.get('message', '').strip()  # Default to empty string if no message is provided
+
+        # Check if the user has already pinged the therapist
+        ping, created = Ping.objects.get_or_create(therapist=therapist, user=request.user)
+
+        if created:
+            # If this is a new ping, store the message
+            ping.message = message
+            ping.save()
+            messages.success(request, "You have successfully pinged the therapist!")
+        else:
+            # If the ping already exists, update the message
+            ping.message = message
+            ping.save()
+            messages.info(request, "You have already pinged this therapist, message updated.")
+
+        return redirect('therapist_detail', therapist_id=therapist_id)
+
+    return render(request, 'user_management/therapist_detail.html', {'therapist': therapist})
+
+
+
+@login_required
+def user_home(request):
+    # You can add any context data you need here
+    return render(request, 'user_management/user_home.html')
+
+
+@login_required
+def pings_view(request):
+    therapist = get_object_or_404(Therapist, user=request.user)
+    pings = therapist.pings.all()
+    return render(request, 'user_management/pings.html', {'pings': pings})
