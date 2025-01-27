@@ -3,9 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-title" content="Chatbot">
+<meta name="apple-mobile-web-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
   <title>Chatbot Interface</title>
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -186,7 +188,20 @@
       });
 
       // Add event listener for the mic button (call button)
-      document.querySelector('.mic-button').addEventListener('click', () => this.startListening());
+     let hasEnabledVoice = false;
+
+document.querySelector('.mic-button').addEventListener('click', () => {
+  // Ensure speech API is enabled for programmatic use
+  if (!hasEnabledVoice) {
+    const lecture = new SpeechSynthesisUtterance('hello');
+    lecture.volume = 0; // Silent speech
+    speechSynthesis.speak(lecture);
+    hasEnabledVoice = true;
+  }
+
+  // Start listening functionality
+  this.startListening();
+});
     }
 
     getCSRFToken() {
@@ -237,11 +252,42 @@
     }
 
     speakResponse(text) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'en-US';
-      utterance.rate = 1.2;
+  // Check if speech synthesis is available
+  if (!window.speechSynthesis) {
+    console.warn('Speech synthesis not supported');
+    return;
+  }
+
+  // Cancel any ongoing speech
+  window.speechSynthesis.cancel();
+
+  const utterance = new SpeechSynthesisUtterance(text);
+
+  // Set properties
+  utterance.lang = 'en-US';
+  utterance.rate = 1.2;
+  utterance.volume = 1;
+
+  // Add error handling
+  utterance.onerror = (event) => {
+    console.error('Speech synthesis error:', event);
+  };
+
+  // Handle iOS-specific initialization
+  if (typeof window.speechSynthesis.speak === 'function') {
+    // Ensure voice synthesis is ready (especially important for iOS)
+    const startSpeaking = () => {
       window.speechSynthesis.speak(utterance);
+    };
+
+    if (window.speechSynthesis.speaking) {
+      window.speechSynthesis.cancel();
+      setTimeout(startSpeaking, 50);
+    } else {
+      startSpeaking();
     }
+  }
+}
 
     startListening() {
       if (annyang) {
