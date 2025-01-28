@@ -5,7 +5,7 @@ from markdown2 import markdown
 
 # Configure the API key
 genai.configure(api_key="AIzaSyD-4HZiBslNKdFP50NJGl6YQgeae3jOPFU")
-model = genai.GenerativeModel('gemini-1.5-flash')
+model = genai.GenerativeModel("gemini-1.5-flash")
 
 pre_info = """
 You are an AI chatbot designed to provide emotional support to construction workers in the UK. 
@@ -30,13 +30,14 @@ Avoid promising solutions beyond the chatbot's scope, emphasizing your role as a
 chat = model.start_chat(history=[])
 chat.send_message(pre_info)
 
+
 def chatbot_home(request):
-    return render(request, 'chatbot/index.html')
+    return render(request, "chatbot/test.html")
 
 
 def chatbot_response(request):
     if request.method == "POST":
-        user_input = request.POST.get('message')
+        user_input = request.POST.get("message")
         if user_input.lower() == "exit":
             return JsonResponse({"response": "Goodbye!"})
 
@@ -48,6 +49,3 @@ def chatbot_response(request):
         html_response = markdown(full_response)
 
         return JsonResponse({"response": html_response})
-
-
-
