@@ -1,0 +1,877 @@
+{% extends 'user_management/base_with_nav.html' %}
+{% block extra_css %}
+<style>
+  body {
+    background: radial-gradient(
+      circle,
+      rgba(50, 0, 100, 0.9) 0%,
+      rgba(30, 0, 70, 0.95) 50%,
+      rgba(20, 0, 50, 1) 100%
+    );
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Poppins', sans-serif;
+    letter-spacing: 0.3px;
+  }
+
+  body.blur {
+    filter: blur(5px);
+  }
+
+  .bubble {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100px; /* Adjust size as needed */
+    height: 100px; /* Adjust size as needed */
+    background: rgba(126, 34, 206, 0.6);
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+    z-index: 2000; /* Ensure it's above other elements */
+  }
+
+  @keyframes pulse {
+    0% {
+      transform: translate(-50%, -50%) scale(1);
+    }
+    50% {
+      transform: translate(-50%, -50%) scale(1.1);
+    }
+    100% {
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  .chat-container {
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: 0 1rem;  /* Add padding for mobile */
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    color: white;
+    position: relative;
+  }
+
+  .header h1 {
+    font-size: clamp(1.5rem, 5vw, 2.5rem);  /* Responsive font size */
+    font-weight: 700;
+    flex-grow: 1;
+    text-align: center;
+    letter-spacing: 1px;
+  }
+
+  .language-selector {
+    position: relative;
+    z-index: 1000;
+  }
+
+  .language-dropdown-content {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: rgba(42, 22, 64, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    min-width: 120px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    margin-top: 0.5rem;
+  }
+
+  .language-option {
+    padding: 0.75rem 1rem;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .language-option:hover {
+    background-color: rgba(126, 34, 206, 0.6);
+  }
+
+  .language-option i {
+    width: 20px;
+  }
+
+  #languageButton {
+    padding: 0.5rem 1rem;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;
+    height: 100%;
+    background-color: rgba(42, 22, 64, 0.9);
+    padding: 1rem;
+    display: none;
+    z-index: 1000;
+  }
+
+  .sidebar-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+  }
+
+  .sidebar-close {
+    color: white;
+    cursor: pointer;
+    font-size: 1.5rem;
+  }
+
+  .sidebar ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .sidebar ul li {
+    margin: 1rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: 0.5rem;
+  }
+
+  .sidebar ul li:last-child {
+    border-bottom: none;
+  }
+
+  .sidebar ul li a {
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s ease;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+
+  .sidebar ul li a:hover {
+    color: #9333ea;
+  }
+
+  .main-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    padding: 1rem;
+  }
+
+  .input-container {
+    background-color: rgba(42, 22, 64, 0.7);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1rem;
+    border-radius: 1rem;
+    position: relative;
+    margin-bottom: 1rem;  /* Add margin for mobile */
+  }
+
+  #user-input {
+    background-color: transparent;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    width: 100%;
+    resize: none;
+    max-height: 150px;
+    overflow-y: auto;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    font-weight: 400;
+    letter-spacing: 0.3px;
+  }
+
+  .action-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+  }
+
+  .action-buttons button {
+    border-radius: 0.5rem;
+  }
+
+  .user-message,
+  .bot-message {
+    color: white;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border-radius: 1rem;
+    font-weight: 400;
+    line-height: 1.6;
+  }
+
+  .user-message {
+    background-color: rgba(126, 34, 206, 0.6);
+    text-align: right;
+  }
+
+  .bot-message {
+    background-color: rgba(55, 48, 163, 0.6);
+    text-align: left;
+  }
+
+  /* Mobile-specific styles */
+  @media (max-width: 768px) {
+    .action-buttons {
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .left-buttons {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .send-button,
+    .custom-button {
+      flex: 1;
+      margin-left: 0.5rem;
+    }
+
+    .sidebar {
+      width: 100%;  /* Full width on mobile */
+      max-width: 300px;
+    }
+
+    .user-message,
+    .bot-message {
+      padding: 0.75rem;
+      font-size: 0.95rem;
+    }
+
+    #user-input {
+      font-size: 0.95rem;
+      padding: 0.5rem;
+    }
+  }
+
+  /* Small mobile devices */
+  @media (max-width: 480px) {
+    .header {
+      padding: 0.5rem;
+    }
+
+    .action-buttons button {
+      width: auto;  /* Adjust button size */
+      height: auto;
+      padding: 0.75rem;
+    }
+
+    .main-content {
+      padding: 0.5rem;
+    }
+  }
+
+  /* Handle very small screens */
+  @media (max-width: 320px) {
+    .header h1 {
+      font-size: 1.2rem;
+    }
+
+    .action-buttons {
+      gap: 0.25rem;
+    }
+
+    .action-buttons button {
+      padding: 0.5rem;
+    }
+  }
+
+  /* Handle landscape orientation */
+  @media (max-height: 500px) and (orientation: landscape) {
+    .chat-container {
+      height: auto;
+      min-height: 100vh;
+    }
+
+    .main-content {
+      max-height: 40vh;
+    }
+  }
+
+  .info-button {
+    background: rgba(147, 51, 234, 0.8);
+    color: #ffffff;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-right: auto;  /* This pushes other elements to the right */
+  }
+
+  .info-button:hover {
+    background: rgba(147, 51, 234, 1);
+    transform: scale(1.1);
+  }
+
+  .info-popup {
+    display: none;
+    position: absolute;
+    top: 60px;
+    left: 20px;
+    background: rgba(42, 22, 64, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 1rem;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    max-width: 300px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+  }
+
+  .info-popup.show {
+    display: block;
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="apple-mobile-web-app-title" content="Chatbot" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <title>Speech Recognition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/1.6.0/annyang.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+
+    <div id="bubble" class="bubble hidden"></div>
+    <div class="chat-container">
+      <div class="header">
+        <button class="info-button" id="infoBtn">
+          <i class="fas fa-info"></i>
+        </button>
+        <h1>John</h1>
+        <div class="language-selector">
+          <button id="languageButton" class="bg-purple-600 text-white p-2 rounded flex items-center gap-2">
+            <i class="fas fa-globe"></i>
+            <span id="currentLang">EN</span>
+            <i class="fas fa-chevron-down"></i>
+          </button>
+          <div id="languageDropdown" class="language-dropdown-content hidden">
+            <!-- Language options will be populated by JavaScript -->
+          </div>
+        </div>
+        <div class="info-popup" id="infoPopup">
+          This chatbot has been trained using mental health advisory guidelines specified by UK and fine-tuned for construction workers in UK.
+        </div>
+      </div>
+
+      <div id="chat-window" class="main-content"></div>
+
+      <div class="input-container">
+        <textarea
+          id="user-input"
+          rows="1"
+          placeholder="Talk to John..."
+          class="flex-grow"
+        ></textarea>
+
+        <div class="action-buttons">
+          <div class="left-buttons flex items-center gap-2">
+            <button
+              class="mic-button bg-purple-600 text-white p-2 w-12 h-12 flex items-center justify-center hover:bg-purple-700 transition"
+            >
+              <i class="fas fa-microphone"></i>
+            </button>
+          </div>
+
+          <button
+            class="send-button bg-green-600 text-white p-2 w-12 h-12 flex items-center justify-center hover:bg-green-700 transition"
+          >
+            <i class="fas fa-rocket"></i>
+          </button>
+
+          <!-- New Button -->
+          <button
+            class="custom-button bg-blue-600 text-white p-2 w-12 h-12 flex items-center justify-center hover:bg-blue-700 transition"
+            onclick="handleCallButtonClick()"
+          >
+            <i class="fas fa-bolt"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      class ChatController {
+        constructor() {
+          this.chatWindow = document.getElementById("chat-window");
+          this.userInput = document.getElementById("user-input");
+          this.currentLanguage = 'en-US';
+          
+          this.languages = {
+            'en-US': { 
+              code: 'en-US', 
+              label: 'EN',
+              name: 'English',
+              placeholder: 'Talk to John...',
+              errorMsg: 'Sorry, something went wrong.'
+            },
+            'es-ES': { 
+              code: 'es-ES', 
+              label: 'ES',
+              name: 'Español',
+              placeholder: 'Habla con John...',
+              errorMsg: 'Lo siento, algo salió mal.'
+            },
+            'pl-PL': { 
+              code: 'pl-PL', 
+              label: 'PL',
+              name: 'Polski',
+              placeholder: 'Porozmawiaj z Johnem...',
+              errorMsg: 'Przepraszamy, coś poszło nie tak.'
+            },
+            'nl-NL': { 
+              code: 'nl-NL', 
+              label: 'NL',
+              name: 'Nederlands',
+              placeholder: 'Praat met John...',
+              errorMsg: 'Sorry, er is iets misgegaan.'
+            },
+            'ro-RO': { 
+              code: 'ro-RO', 
+              label: 'RO',
+              name: 'Română',
+              placeholder: 'Vorbește cu John...',
+              errorMsg: 'Ne pare rău, ceva nu a mers bine.'
+            },
+            'pt-PT': { 
+              code: 'pt-PT', 
+              label: 'PT',
+              name: 'Português',
+              placeholder: 'Fale com John...',
+              errorMsg: 'Desculpe, algo deu errado.'
+            },
+            'sv-SE': { 
+              code: 'sv-SE', 
+              label: 'SV',
+              name: 'Svenska',
+              placeholder: 'Prata med John...',
+              errorMsg: 'Tyvärr, något gick fel.'
+            },
+            'bg-BG': { 
+              code: 'bg-BG', 
+              label: 'BG',
+              name: 'Български',
+              placeholder: 'Говорете с John...',
+              errorMsg: 'Съжаляваме, нещо се обърка.'
+            }
+          };
+          
+          this.setupEventListeners();
+          this.initVoiceRecognition();
+          this.createLanguageDropdown();
+          
+          window.speechSynthesis.onvoiceschanged = () => {
+            this.voices = window.speechSynthesis.getVoices();
+          };
+
+          // Info button functionality
+          const infoBtn = document.getElementById('infoBtn');
+          const infoPopup = document.getElementById('infoPopup');
+          
+          infoBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            infoPopup.classList.toggle('show');
+          });
+
+          // Close popup when clicking outside
+          document.addEventListener('click', (e) => {
+            if (!infoPopup.contains(e.target) && !infoBtn.contains(e.target)) {
+              infoPopup.classList.remove('show');
+            }
+          });
+        }
+
+        createLanguageDropdown() {
+          const dropdown = document.getElementById('languageDropdown');
+          dropdown.innerHTML = ''; // Clear existing content
+          
+          Object.values(this.languages).forEach(lang => {
+            const option = document.createElement('div');
+            option.className = 'language-option';
+            option.innerHTML = `
+              <i class="fas fa-check ${lang.code === this.currentLanguage ? '' : 'hidden'}"></i>
+              <span>${lang.name} (${lang.label})</span>
+            `;
+            option.addEventListener('click', (e) => {
+              e.stopPropagation();
+              this.switchLanguage(lang.code);
+              dropdown.classList.add('hidden');
+            });
+            dropdown.appendChild(option);
+          });
+
+          // Toggle dropdown
+          document.getElementById('languageButton').addEventListener('click', (e) => {
+            e.stopPropagation();
+            dropdown.classList.toggle('hidden');
+          });
+
+          // Close dropdown when clicking outside
+          document.addEventListener('click', () => {
+            dropdown.classList.add('hidden');
+          });
+        }
+
+        switchLanguage(langCode) {
+          const lang = this.languages[langCode];
+          if (!lang) return;
+          
+          this.currentLanguage = langCode;
+          document.getElementById('currentLang').textContent = lang.label;
+          this.userInput.placeholder = lang.placeholder;
+          
+          // Update checkmarks in dropdown
+          const options = document.querySelectorAll('.language-option i');
+          options.forEach(icon => icon.classList.add('hidden'));
+          const selectedOption = document.querySelector(`.language-option:nth-child(${Object.keys(this.languages).indexOf(langCode) + 1}) i`);
+          if (selectedOption) selectedOption.classList.remove('hidden');
+          
+          if (annyang) {
+            annyang.setLanguage(langCode);
+          }
+          
+          console.log('Language switched to:', langCode);
+        }
+
+        setupEventListeners() {
+          document
+            .querySelector(".send-button")
+            .addEventListener("click", () => this.sendMessage());
+
+          this.userInput.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              this.sendMessage();
+            }
+          });
+
+          // Initialize voice recognition state
+          let hasEnabledVoice = false;
+
+          document
+            .querySelector(".mic-button")
+            .addEventListener("click", () => {
+              // Force enable voice on first click
+              if (!hasEnabledVoice) {
+                const lecture = new SpeechSynthesisUtterance("hello");
+                lecture.volume = 0;
+                speechSynthesis.speak(lecture);
+                hasEnabledVoice = true;
+              }
+
+              // Show the listening bubble
+              document.body.classList.add("blur");
+              const bubble = document.getElementById("bubble");
+              bubble.classList.remove("hidden");
+
+              // Start listening
+              this.startListening();
+            });
+        }
+
+        getCSRFToken() {
+          const cookies = document.cookie.split(";");
+          for (let cookie of cookies) {
+            cookie = cookie.trim();
+            if (cookie.startsWith("csrftoken=")) {
+              return cookie.substring("csrftoken=".length);
+            }
+          }
+          return "";
+        }
+
+        async sendMessage() {
+          const message = this.userInput.value.trim();
+          if (!message) return;
+
+          this.appendMessage("user", message);
+          this.userInput.value = "";
+
+          try {
+            const response = await fetch("/get-response/", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": this.getCSRFToken(),
+              },
+              body: `message=${encodeURIComponent(message)}&language=${this.currentLanguage}`,
+            });
+
+            if (!response.ok) throw new Error("Network response was not ok");
+
+            const data = await response.json();
+            this.appendMessage("bot", data.response);
+            this.speakResponse(data.response);
+          } catch (error) {
+            console.error("Error:", error);
+            const errorMessage = this.languages[this.currentLanguage].errorMsg;
+            this.appendMessage("bot", errorMessage);
+          }
+        }
+
+        appendMessage(sender, message) {
+          const messageDiv = document.createElement("div");
+          messageDiv.className =
+            sender === "user" ? "user-message" : "bot-message";
+          messageDiv.innerHTML = `<strong>${
+            sender === "user" ? "You" : "John"
+          }:</strong> ${message}`;
+          this.chatWindow.appendChild(messageDiv);
+          this.chatWindow.scrollTop = this.chatWindow.scrollHeight;
+        }
+
+        speakResponse(text) {
+          if ('speechSynthesis' in window) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            
+            // Set language based on current selection
+            utterance.lang = this.currentLanguage;
+            
+            // Get available voices
+            const voices = window.speechSynthesis.getVoices();
+            
+            // Try to find a voice for the current language
+            const languageVoice = voices.find(voice => 
+                voice.lang.startsWith(this.currentLanguage.split('-')[0]) && 
+                !voice.name.includes('Google')
+            ) || voices.find(voice => 
+                voice.lang.startsWith(this.currentLanguage.split('-')[0])
+            );
+
+            // If a matching voice is found, use it
+            if (languageVoice) {
+                utterance.voice = languageVoice;
+            }
+
+            // Adjust speech parameters for better clarity
+            utterance.rate = 1.0;
+            utterance.pitch = 1.0;
+            utterance.volume = 1.0;
+
+            // Handle any errors
+            utterance.onerror = (event) => {
+                console.error('Speech synthesis error:', event);
+            };
+
+            // Speak the text
+            window.speechSynthesis.speak(utterance);
+          }
+        }
+
+        startListening() {
+          if (annyang) {
+            // Stop any existing recognition
+            annyang.abort();
+            
+            // Clear existing commands
+            annyang.removeCommands();
+
+            // Set the language
+            annyang.setLanguage(this.currentLanguage);
+            console.log('Voice recognition language set to:', this.currentLanguage);
+
+            // Add the command to capture any speech
+            annyang.addCommands({
+              '*message': (message) => {
+                document.body.classList.remove("blur");
+                const bubble = document.getElementById("bubble");
+                bubble.classList.add("hidden");
+                
+                // Set the message in the input field
+                this.userInput.value = message;
+                
+                // Send the message
+                this.sendMessage();
+                
+                // Stop listening after capturing the message
+                annyang.abort();
+              }
+            });
+
+            // Start listening
+            annyang.start({ autoRestart: false, continuous: false });
+
+            // Add error handling
+            annyang.addCallback('error', (err) => {
+              console.error('Voice recognition error:', err);
+              document.body.classList.remove("blur");
+              const bubble = document.getElementById("bubble");
+              bubble.classList.add("hidden");
+              alert('Voice recognition error. Please try again.');
+            });
+
+            // Add end callback
+            annyang.addCallback('end', () => {
+              document.body.classList.remove("blur");
+              const bubble = document.getElementById("bubble");
+              bubble.classList.add("hidden");
+            });
+          } else {
+            alert("Speech recognition is not supported in your browser. Please try using Chrome.");
+          }
+        }
+
+        initVoiceRecognition() {
+          if (annyang) {
+            const commands = {
+              "*message": (message) => {
+                this.appendMessage("user", message);
+                this.sendMessageFromVoice(message);
+              },
+            };
+
+            annyang.addCommands(commands);
+
+            annyang.addCallback("start", () => {
+              console.log("Listening...");
+            });
+
+            annyang.addCallback("end", () => {
+              console.log("Stopped listening...");
+              document.body.classList.remove("blur");
+              const bubble = document.getElementById("bubble");
+              bubble.classList.add("hidden");
+            });
+          }
+        }
+
+        async sendMessageFromVoice(message) {
+          try {
+            const response = await fetch("/get-response/", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": this.getCSRFToken(),
+              },
+              body: `message=${encodeURIComponent(message)}`,
+            });
+
+            if (!response.ok) throw new Error("Network response was not ok");
+
+            const data = await response.json();
+            this.appendMessage("bot", data.response);
+            this.speakResponse(data.response);
+          } catch (error) {
+            console.error("Error:", error);
+            this.appendMessage("bot", "Sorry, something went wrong.");
+          }
+        }
+      }
+
+      const chatController = new ChatController();
+
+      const sidebarButton = document.getElementById("sidebarButton");
+      const sidebar = document.getElementById("sidebar");
+      const closeSidebarButton = document.getElementById("closeSidebar");
+
+      sidebarButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        sidebar.style.display = "block";
+      });
+
+      closeSidebarButton.addEventListener("click", () => {
+        sidebar.style.display = "none";
+      });
+
+      function handleCallButtonClick() {
+        const phoneNumber = prompt("Enter your phone number with country code (eg: +44 27189213 ):");
+
+        if (phoneNumber) {
+          const url = 'https://api-west.millis.ai/start_outbound_call';
+          const requestData = {
+            from_phone: "+16509103975",
+            to_phone: phoneNumber,
+            metadata: { key: "value" },
+            include_metadata_in_prompt: true
+          };
+
+          fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'jsjFbi3k5n1Cm45E23KKHrPGhdINq9nq',
+            },
+            body: JSON.stringify(requestData),
+          })
+          .then(response => {
+            console.log(response);
+            if (response.ok) {
+              alert("Call request sent successfully!");
+            } else {
+              alert("Failed to send the call request.");
+            }
+          })
+          .catch(error => {
+            console.error("Error:", error);
+            alert("An error occurred while sending the call request.");
+          });
+        } else {
+          alert("No phone number entered.");
+        }
+      }
+
+      document.addEventListener("click", (event) => {
+        if (!sidebar.contains(event.target) && event.target !== sidebarButton) {
+          sidebar.style.display = "none";
+        }
+      });
+    </script>
+  </body>
+</html>
+{% endblock %}

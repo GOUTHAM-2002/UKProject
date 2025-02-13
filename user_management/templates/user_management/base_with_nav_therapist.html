@@ -1,0 +1,85 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mental Health Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% block content %}{% endblock %}
+
+    <nav class="bottom-nav">
+        <a href="{% url 'profile_page_therapist' %}" class="nav-item {% if request.resolver_match.url_name == 'profile_page_therapist' %}active{% endif %}">
+            <i class="fas fa-user-md"></i>
+            <span>Profile</span>
+        </a>
+        <a href="{% url 'therapist_chat' %}" class="nav-item {% if request.resolver_match.url_name == 'therapist_chat' %}active{% endif %}">
+            <i class="fas fa-comments"></i>
+            <span>Patient Chats</span>
+        </a>
+        <a href="{% url 'posts_list' %}" class="nav-item {% if request.resolver_match.url_name == 'posts_list' %}active{% endif %}">
+            <i class="fas fa-newspaper"></i>
+            <span>Resources</span>
+        </a>
+    </nav>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1e0f2d 0%, #2a1640 100%);
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            padding-bottom: 70px;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(30, 15, 45, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            border-top: 1px solid rgba(147, 51, 234, 0.2);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.7);
+            transition: all 0.3s ease;
+            padding: 8px 20px;
+            border-radius: 12px;
+        }
+
+        .nav-item i {
+            font-size: 1.5rem;
+            margin-bottom: 4px;
+        }
+
+        .nav-item span {
+            font-size: 0.8rem;
+        }
+
+        .nav-item:hover {
+            color: #9333ea;
+            transform: translateY(-2px);
+        }
+
+        .nav-item.active {
+            color: #9333ea;
+            background: rgba(147, 51, 234, 0.1);
+        }
+    </style>
+</body>
+</html> 

@@ -1,0 +1,144 @@
+{% extends 'user_management/base_with_nav.html' %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <h1 class="text-center mb-4">Mental Health Resources</h1>
+    
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="article-card">
+                <div class="icon-wrapper">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3>Understanding Stress in Construction</h3>
+                <p>Construction workers face unique stressors daily. Physical demands, tight deadlines, and workplace hazards can contribute to mental strain. Understanding these challenges is the first step toward better mental health.</p>
+                <div class="quotes-carousel">
+                    <div class="quote">"Mental health is just as important as physical safety on site."</div>
+                    <div class="quote">"Taking care of your mind is as crucial as wearing your PPE."</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="article-card">
+                <div class="icon-wrapper">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <h3>Self-Care Strategies</h3>
+                <p>Simple daily practices can make a big difference. Taking regular breaks, staying hydrated, and maintaining good sleep habits are essential. Remember, self-care isn't selfish—it's necessary for your wellbeing and job performance.</p>
+                <div class="quotes-carousel">
+                    <div class="quote">"Small steps toward self-care lead to big improvements in mental health."</div>
+                    <div class="quote">"Your wellbeing matters - make time for yourself."</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="article-card">
+                <div class="icon-wrapper">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3>Building Support Networks</h3>
+                <p>Strong connections with colleagues and loved ones provide crucial emotional support. Don't hesitate to reach out to coworkers, friends, or family when feeling overwhelmed. Remember, seeking help is a sign of strength, not weakness.</p>
+                <div class="quotes-carousel">
+                    <div class="quote">"You're not alone - your crew has your back."</div>
+                    <div class="quote">"Together we're stronger - reach out when you need support."</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="article-card">
+                <div class="icon-wrapper">
+                    <i class="fas fa-balance-scale"></i>
+                </div>
+                <h3>Work-Life Balance</h3>
+                <p>Maintaining a healthy balance between work and personal life is crucial. Set boundaries, make time for hobbies, and prioritize family time. Your job is important, but so is your life outside of work.</p>
+                <div class="quotes-carousel">
+                    <div class="quote">"Balance isn't about perfect equilibrium, it's about finding what works for you."</div>
+                    <div class="quote">"Make time for what matters most in your life."</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="article-card">
+                <div class="icon-wrapper">
+                    <i class="fas fa-hands-helping"></i>
+                </div>
+                <h3>Professional Support Services</h3>
+                <p>The construction industry has dedicated mental health resources available. The Construction Industry Helpline (0345 605 1956) provides 24/7 support, and organizations like Mates in Mind offer specialized assistance for construction workers.</p>
+                <div class="quotes-carousel">
+                    <div class="quote">"Reaching out for professional help shows courage and wisdom."</div>
+                    <div class="quote">"Your mental health matters - support is always available."</div>
+                    <div class="quote">"Every step toward better mental health is a step worth taking."</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .article-card {
+        background: rgba(42, 22, 64, 0.7);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 2rem;
+        height: 100%;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+        color: white;
+    }
+
+    .article-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .icon-wrapper {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        opacity: 0.9;
+    }
+
+    .article-card h3 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        color: white;
+    }
+
+    .article-card p {
+        font-size: 1rem;
+        opacity: 0.9;
+        line-height: 1.6;
+    }
+
+    .quotes-carousel {
+        text-align: center;
+        font-style: italic;
+    }
+
+    .quote {
+        margin: 1rem 0;
+        font-size: 1.2rem;
+        line-height: 1.6;
+        padding: 1rem;
+        border-radius: 15px;
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    @media (max-width: 768px) {
+        .article-card {
+            padding: 1.5rem;
+        }
+
+        .icon-wrapper {
+            font-size: 2rem;
+        }
+
+        .article-card h3 {
+            font-size: 1.3rem;
+        }
+    }
+</style>
+{% endblock %} 

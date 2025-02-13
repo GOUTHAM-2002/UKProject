@@ -1,0 +1,396 @@
+{% extends 'user_management/base_with_nav_therapist.html' %}
+
+{% block content %}
+<div class="therapist-dashboard">
+    {% csrf_token %}
+    
+    <div class="patients-sidebar">
+        <div class="search-container">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="patient-search" placeholder="Search patients...">
+            </div>
+        </div>
+
+        <div class="patients-list">
+            {% for partner in chat_partners %}
+            <div class="patient-card" data-partner-id="{{ partner.id }}">
+                <div class="patient-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="patient-info">
+                    <h3>{{ partner.get_full_name }}</h3>
+                    <p class="last-message">{{ partner.last_message|default:"No messages yet"|truncatechars:30 }}</p>
+                </div>
+            </div>
+            {% empty %}
+            <div class="no-patients">
+                <p>No patients have messaged you yet.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="chat-main">
+        <div class="chat-header">
+            <div id="current-patient-info">
+                <h2>Select a patient to start chatting</h2>
+            </div>
+        </div>
+
+        <div id="messages-container" class="messages-area">
+            <div class="welcome-message">
+                <i class="fas fa-user-md"></i>
+                <h2>Welcome, Dr. {{ request.user.get_full_name }}</h2>
+                <p>Select a patient from the list to view your conversation</p>
+            </div>
+        </div>
+
+        <div class="message-composer">
+            <textarea id="message-input" placeholder="Type your message..." disabled></textarea>
+            <button id="send-message" disabled>
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .therapist-dashboard {
+        display: flex;
+        height: calc(100vh - 70px);
+        margin: 20px;
+        background: rgba(30, 15, 45, 0.95);
+        border-radius: 20px;
+        overflow: hidden;
+    }
+
+    .patients-sidebar {
+        width: 350px;
+        background: rgba(42, 22, 64, 0.9);
+        border-right: 1px solid rgba(147, 51, 234, 0.2);
+    }
+
+    .search-container {
+        padding: 20px;
+        border-bottom: 1px solid rgba(147, 51, 234, 0.2);
+    }
+
+    .search-box {
+        background: rgba(147, 51, 234, 0.1);
+        border-radius: 12px;
+        padding: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .patient-card {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        border-bottom: 1px solid rgba(147, 51, 234, 0.1);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .patient-card:hover, .patient-card.active {
+        background: rgba(147, 51, 234, 0.1);
+    }
+
+    .patient-card.active {
+        border-left: 3px solid #9333ea;
+    }
+
+    .patient-avatar {
+        position: relative;
+        width: 50px;
+        height: 50px;
+        background: rgba(147, 51, 234, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+    }
+
+    .online-indicator {
+        position: absolute;
+        bottom: 2px;
+        right: 2px;
+        width: 12px;
+        height: 12px;
+        background: #10B981;
+        border-radius: 50%;
+        border: 2px solid rgba(30, 15, 45, 0.95);
+    }
+
+    .chat-main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .messages-area {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        background: url('data:image/png;base64,...') center;
+    }
+
+    .message-composer {
+        padding: 20px;
+        background: rgba(42, 22, 64, 0.9);
+        border-top: 1px solid rgba(147, 51, 234, 0.2);
+        display: flex;
+        gap: 15px;
+    }
+
+    .message-composer textarea {
+        flex: 1;
+        background: rgba(147, 51, 234, 0.1);
+        border: 1px solid rgba(147, 51, 234, 0.2);
+        border-radius: 12px;
+        padding: 12px;
+        color: white;
+        resize: none;
+        height: 50px;
+    }
+
+    .message {
+        max-width: 70%;
+        margin: 8px;
+        padding: 10px 15px;
+        border-radius: 15px;
+        position: relative;
+        color: #fff;
+    }
+
+    .message.sent {
+        background: #005c4b;
+        margin-left: auto;
+        border-top-right-radius: 4px;
+    }
+
+    .message.received {
+        background: #202c33;
+        margin-right: auto;
+        border-top-left-radius: 4px;
+    }
+
+    .message-info {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.75rem;
+        opacity: 0.7;
+        margin-top: 4px;
+    }
+
+    .message-time {
+        font-size: 0.75rem;
+    }
+
+    .fa-check.read {
+        color: #34b7f1;
+    }
+
+    .messages-area {
+        padding: 20px;
+        overflow-y: auto;
+        background: #0b141a;
+    }
+
+    #message-input {
+        background: #2a3942;
+        border: none;
+        color: #d1d7db;
+        padding: 12px;
+        border-radius: 8px;
+        resize: none;
+        height: 45px;
+        font-size: 0.95rem;
+    }
+
+    #message-input:focus {
+        outline: none;
+    }
+
+    #send-message {
+        background: none;
+        border: none;
+        color: #8696a0;
+        font-size: 1.5rem;
+        cursor: pointer;
+        transition: color 0.3s ease;
+    }
+
+    #send-message:hover:not(:disabled) {
+        color: #00a884;
+    }
+
+    .welcome-message {
+        text-align: center;
+        padding: 20px;
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .message-composer {
+        display: flex;
+        gap: 10px;
+        padding: 15px;
+        background: rgba(42, 22, 64, 0.9);
+    }
+
+    #message-input:not(:disabled) {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+    }
+
+    @media (max-width: 768px) {
+        .therapist-dashboard {
+            flex-direction: column;
+            height: calc(100vh - 70px);
+            margin: 10px;
+        }
+
+        .patients-sidebar {
+            width: 100%;
+            height: 40vh;
+            overflow-y: auto;
+        }
+
+        .chat-main {
+            height: 60vh;
+        }
+
+        .messages-area {
+            height: calc(100% - 140px);
+        }
+
+        .message {
+            max-width: 85%;
+        }
+
+        .message-composer {
+            padding: 10px;
+        }
+
+        .message-composer textarea {
+            height: 40px;
+        }
+
+        .patient-card {
+            padding: 10px;
+        }
+
+        .patient-avatar {
+            width: 40px;
+            height: 40px;
+        }
+
+        .chat-header {
+            padding: 10px 15px;
+        }
+
+        .chat-header h2 {
+            font-size: 1.2rem;
+        }
+    }
+</style>
+
+<script>
+const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+let currentPartnerId = null;
+let messagePollingInterval = null;
+
+// Patient selection
+document.querySelectorAll('.patient-card').forEach(card => {
+    card.addEventListener('click', () => {
+        // Clear previous selection
+        document.querySelectorAll('.patient-card').forEach(c => c.classList.remove('active'));
+        
+        // Set new selection
+        card.classList.add('active');
+        currentPartnerId = card.dataset.partnerId;
+        
+        // Update header
+        const patientName = card.querySelector('h3').textContent;
+        document.getElementById('current-patient-info').innerHTML = `
+            <h2>Chat with ${patientName}</h2>
+        `;
+        
+        // Enable input
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-message');
+        messageInput.disabled = false;
+        sendButton.disabled = false;
+        
+        // Load messages
+        loadMessages(currentPartnerId);
+        
+        // Start polling
+        if (messagePollingInterval) clearInterval(messagePollingInterval);
+        messagePollingInterval = setInterval(() => loadMessages(currentPartnerId), 3000);
+        
+        // Hide welcome message
+        document.querySelector('.welcome-message').style.display = 'none';
+    });
+});
+
+function loadMessages(partnerId) {
+    fetch(`/user/chat/messages/${partnerId}/`)
+        .then(response => response.json())
+        .then(messages => {
+            const container = document.getElementById('messages-container');
+            container.innerHTML = '';
+            
+            messages.forEach(msg => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${msg.sender ? 'sent' : 'received'}`;
+                messageDiv.innerHTML = `
+                    <div class="message-content">${msg.content}</div>
+                    <div class="message-info">
+                        <span class="message-time">${msg.timestamp}</span>
+                    </div>
+                `;
+                container.appendChild(messageDiv);
+            });
+            
+            container.scrollTop = container.scrollHeight;
+        });
+}
+
+// Message sending
+function sendMessage() {
+    const textarea = document.getElementById('message-input');
+    const message = textarea.value.trim();
+    
+    if (message && currentPartnerId) {
+        fetch(`/user/chat/send/${currentPartnerId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': csrftoken
+            },
+            body: `message=${encodeURIComponent(message)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                textarea.value = '';
+                loadMessages(currentPartnerId);
+            }
+        });
+    }
+}
+
+document.getElementById('send-message').addEventListener('click', sendMessage);
+document.getElementById('message-input').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+    }
+});
+</script>
+{% endblock %}
