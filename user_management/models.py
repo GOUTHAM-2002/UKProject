@@ -148,4 +148,14 @@ class Post(models.Model):
     def update_upvote_count(self):
         self.upvote_count = self.upvotes.count()
         self.save()
+class UserGeminiChat(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='gemini_chats')
+    user_message = models.TextField()
+    gemini_response = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    sentiment_score = models.FloatField(null=True, blank=True)
+    topic_category = models.CharField(max_length=100, null=True, blank=True)
+
+    class Meta:
+        ordering = ['-timestamp']
 

@@ -11,7 +11,107 @@ from .models import Therapist, Ping
 from django.db import models
 from django.http import JsonResponse
 from django.contrib.auth.models import User
+from django.http import JsonResponse
+import google.generativeai as genai
+from datetime import timedelta
+from django.utils import timezone
+from .models import UserGeminiChat, CustomUser
+from django.shortcuts import get_object_or_404
+import json
 
+from django.conf import settings  # Add this at the top with other imports
+
+@login_required
+def generate_insights(request, user_id):
+    try:
+        print(f"\n=== Generating Weekly Insights ===")
+        print(f"User ID: {user_id}")
+        
+        user = get_object_or_404(CustomUser, id=user_id)
+        print(f"Found user: {user.email}")
+        
+        # Configure Gemini
+        genai.configure(api_key=settings.GEMINI_API_KEY)
+        print("Configured Gemini API")
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        print("Created Gemini model")
+        
+        # Get last week's chats
+        end_date = timezone.now()
+        start_date = end_date - timedelta(days=7)
+        print(f"Searching for chats between {start_date} and {end_date}")
+        
+        chats = UserGeminiChat.objects.filter(
+            user_id=user_id,
+            timestamp__range=(start_date, end_date)
+        ).order_by('timestamp')
+        print(f"Found {chats.count()} chats")
+
+        if not chats.exists():
+            print("No chats found - returning empty data")
+            return JsonResponse({
+                'dates': [],
+                'sentiment_scores': [],
+                'topics': [],
+                'insights': [{
+                    'title': 'No Data Available',
+                    'description': 'No chat history found for the past week.',
+                    'icon': 'fa-info-circle'
+                }]
+            })
+
+        # Prepare chat history for analysis
+        chat_history = "\n".join([
+            f"User: {chat.user_message}\nGemini: {chat.gemini_response}"
+            for chat in chats
+        ])
+        print(f"Analyzing {len(chats)} chat messages")
+
+        # Generate insights using Gemini
+        prompt = """
+        Analyze this chat history and provide insights. Return a JSON object with exactly these keys:
+        {
+            "sentiment_scores": [numbers between 0-1 representing emotional state for each message],
+            "topics": [{"name": "topic name", "count": number of occurrences}],
+            "insights": [{"title": "insight title", "description": "detailed observation", "icon": "font-awesome-icon-name"}]
+        }
+        Focus on emotional patterns, recurring themes, and progress indicators.
+        Chat History:
+        """ + chat_history
+
+        print("Sending request to Gemini")
+        response = model.generate_content(prompt)
+        print(f"Received Gemini response: {response.text[:200]}...")
+
+        try:
+            # Clean the response text by removing markdown code blocks
+            cleaned_response = response.text.replace('```json', '').replace('```', '').strip()
+            print(f"Cleaned response: {cleaned_response[:200]}...")
+            
+            analysis = json.loads(cleaned_response)
+            print("Successfully parsed Gemini response as JSON")
+
+            result = {
+                'dates': [chat.timestamp.strftime('%Y-%m-%d') for chat in chats],
+                'sentiment_scores': analysis.get('sentiment_scores', []),
+                'topics': analysis.get('topics', []),
+                'insights': analysis.get('insights', [])
+            }
+            print("Prepared final response")
+            return JsonResponse(result)
+
+        except json.JSONDecodeError as e:
+            print(f"Error parsing Gemini response: {e}")
+            print(f"Raw response that couldn't be parsed: {response.text}")
+            return JsonResponse({
+                'error': 'Failed to parse analysis results'
+            }, status=500)
+
+    except Exception as e:
+        print(f"Error in generate_insights: {str(e)}")
+        return JsonResponse({
+            'error': str(e)
+        }, status=500)
 @login_required
 def profile_page_therapist(request):
     therapist = request.user.therapist
@@ -341,13 +441,17 @@ def posts_list(request):
     else:
         posts = Post.objects.order_by('-created_at')
     
-    # Determine which base template to use
-    base_template = 'user_management/base_with_nav_therapist.html' if hasattr(request.user, 'therapist') else 'user_management/base_with_nav.html'
+    # Check if the user is a therapist
+    is_therapist = hasattr(request.user, 'therapist')
+    
+    # Use different base templates for therapist and regular users
+    base_template = 'user_management/base_with_nav_therapist.html' if is_therapist else 'user_management/base_with_nav.html'
     
     return render(request, 'user_management/posts_list.html', {
         'posts': posts,
         'sort_by': sort_by,
-        'base_template': base_template
+        'base_template': base_template,
+        'is_therapist': is_therapist  # Pass this to template
     })
 
 

@@ -3,9 +3,8 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from markdown2 import markdown
 from django.contrib.auth.decorators import login_required
-from googletrans import Translator
-import asyncio
-from deep_translator import GoogleTranslator
+from user_management.models import UserGeminiChat  # Add this import
+import google.generativeai as genai
 
 # Configure the API key
 genai.configure(api_key="AIzaSyD-4HZiBslNKdFP50NJGl6YQgeae3jOPFU")
@@ -48,10 +47,25 @@ def get_chatbot_response(message, language):
 def chatbot_response(request):
     if request.method == "POST":
         message = request.POST.get('message', '')
-        language = request.POST.get('language', 'en')  # Get the selected language
+        language = request.POST.get('language', 'en')
         
-        # Get response from chatbot in the selected language
+        print(f"\n=== Chatbot Interaction ===")
+        print(f"User ID: {request.user.id}")
+        print(f"Message: {message}")
+        print(f"Language: {language}")
+        
+        # Get response from chatbot
         response = get_chatbot_response(message, language)
+        print(f"Gemini Response: {response[:100]}...")  # Print first 100 chars
+        
+        # Save the chat to database
+        chat = UserGeminiChat.objects.create(
+            user=request.user,
+            user_message=message,
+            gemini_response=response,
+            sentiment_score=0.5
+        )
+        print(f"Chat saved to database with ID: {chat.id}")
         
         return JsonResponse({"response": response})
     

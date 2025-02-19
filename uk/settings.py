@@ -136,6 +136,8 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+GEMINI_API_KEY = 'AIzaSyD-4HZiBslNKdFP50NJGl6YQgeae3jOPFU'  # Replace with your actual API key
+
 CSRF_TRUSTED_ORIGINS = ['https://ukproject-1.onrender.com']
 
 AUTH_USER_MODEL = 'user_management.CustomUser'
