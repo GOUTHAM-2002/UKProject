@@ -21,6 +21,18 @@ import json
 
 from django.conf import settings  # Add this at the top with other imports
 
+
+@login_required
+def user_analytics_view(request, user_id):
+    user = get_object_or_404(CustomUser, id=user_id)
+    chats_count = UserGeminiChat.objects.filter(user=user).count()
+    questionnaires = Questionnaire.objects.filter(user=user)
+    
+    return render(request, 'user_management/user_analytics.html', {
+        'user': user,
+        'chats_count': chats_count,
+        'questionnaires': questionnaires
+    })
 @login_required
 def generate_insights(request, user_id):
     try:

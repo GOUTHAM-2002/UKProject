@@ -4,10 +4,12 @@ from django.urls import path
 from .views import delete_post, edit_post, register_user, register_therapist, login_view, base, edit_profile_user, profile_page_user, \
     profile_page_therapist, edit_profile_therapist, therapist_list, therapist_detail, user_home, pings_view, \
     user_questionnaire, questionnaire_view, research_view, chat_view, get_messages, send_message, start_chat, \
-    therapist_chat_view, posts_list, create_post, upvote_post,generate_insights
+    therapist_chat_view, posts_list, create_post, upvote_post,generate_insights,user_analytics_view
 from django.contrib.auth.views import LogoutView
 
 urlpatterns = [
+    path('user/<int:user_id>/analytics/', user_analytics_view, name='user_analytics'),
+    path('user/<int:user_id>/generate-insights/', generate_insights, name='generate_insights'),
     path('register/user/', register_user, name='register_user'),
     path('register/therapist/', register_therapist, name='register_therapist'),
     path('login/', login_view, name='login'),
@@ -35,5 +37,5 @@ urlpatterns = [
     path('posts/upvote/<int:post_id>/', upvote_post, name='upvote_post'),
     path('posts/edit/<int:post_id>/', edit_post, name='edit_post'),
     path('posts/delete/<int:post_id>/', delete_post, name='delete_post'),
-    path('api/generate-insights/<int:user_id>/', generate_insights, name='generate_insights'),
+    # path('api/generate-insights/<int:user_id>/', generate_insights, name='generate_insights'),
 ]

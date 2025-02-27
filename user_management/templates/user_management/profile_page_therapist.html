@@ -69,7 +69,7 @@
                             <p>{{ ping.message|truncatechars:100 }}</p>
                             <div class="ping-footer">
                                 <span class="ping-time">{{ ping.timestamp|timesince }} ago</span>
-                                <a href="{% url 'user_questionnaire' ping.user.id %}" class="view-details-btn">
+                                <a href="{% url 'user_analytics' ping.user.id %}" class="view-details-btn">
                                     View Details
                                 </a>
                             </div>
